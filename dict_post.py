@@ -1,32 +1,37 @@
 class MeuDicionario:
-    def __init__(self):
-        self._tamanho = 128
-        self._chaves = [None for i in range(128)]
-        self._valores = [None for i in range(128)]
+    def __init__(self, tamanho_inicial=128):
+        self._tamanho = tamanho_inicial
+        self._chaves = [[] for i in range(self._tamanho)]
+        self._valores = [[] for i in range(self._tamanho)]
     
     def __setitem__(self, chave, valor):
         posicao = hash(chave) % self._tamanho
-        self._chaves[posicao] = chave
-        self._valores[posicao] = valor
+        self._chaves[posicao].append(chave)
+        self._valores[posicao].append(valor)
     
     def __getitem__(self, chave):
         posicao = hash(chave) % self._tamanho
-        return self._valores[posicao]
+        sub_posicao = self._chaves[posicao].index(chave)
+        return self._valores[posicao][sub_posicao]
     
     def __contains__(self, chave):
         posicao = hash(chave) % self._tamanho
-        return self._chaves[posicao] is not None
+        return chave in self._chaves[posicao]
     
     def values(self):
-        return [valor for valor in self._valores if valor is not None]
+        for valores in self._valores:
+            if valores is not None:
+                for valor in valores:
+                    yield valor
 
     def items(self):
         for par in zip(self._chaves, self._valores):
-            if par[0] is not None:
-                yield par
+            if par[0]:
+                for chave, valor in zip(par[0], par[1]):
+                    yield chave, valor
         
 # testes
-d = MeuDicionario()
+d = MeuDicionario(tamanho_inicial=1)
 d["chave"] = "valor"
 assert d["chave"] == "valor"
 assert "chave" in d
@@ -34,6 +39,12 @@ assert "valor" in d.values()
 for c, v in d.items():
     assert c == "chave"
     assert v == "valor"
+
+d["outra chave"] = "outro valor"
+assert d["chave"] == "valor"
+assert d["outra chave"] == "outro valor"
+print("chaves", d._chaves)
+print("valores", d._valores)
 
 print("sucesso!")
 
