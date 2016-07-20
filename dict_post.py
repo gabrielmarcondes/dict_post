@@ -1,13 +1,26 @@
 class MeuDicionario:
     def __init__(self, tamanho_inicial=128):
         self._tamanho = tamanho_inicial
+        self._ocupacao = 0
         self._chaves = [[] for i in range(self._tamanho)]
         self._valores = [[] for i in range(self._tamanho)]
+        
+    def _expandir(self):
+        print("expandindo!")
+        pares_existentes = list(self.items())
+        self._tamanho = int(1.5 * self._tamanho)
+        self._chaves = [[] for i in range(self._tamanho)]
+        self._valores = [[] for i in range(self._tamanho)]
+        for chave, valor in pares_existentes:
+            self[chave] = valor
     
     def __setitem__(self, chave, valor):
+        if self._ocupacao / self._tamanho > 0.3:
+            self._expandir()        
         posicao = hash(chave) % self._tamanho
         self._chaves[posicao].append(chave)
         self._valores[posicao].append(valor)
+        self._ocupacao += 1
     
     def __getitem__(self, chave):
         posicao = hash(chave) % self._tamanho
@@ -31,7 +44,7 @@ class MeuDicionario:
                     yield chave, valor
         
 # testes
-d = MeuDicionario(tamanho_inicial=1)
+d = MeuDicionario(tamanho_inicial=3)
 d["chave"] = "valor"
 assert d["chave"] == "valor"
 assert "chave" in d
@@ -45,6 +58,7 @@ assert d["chave"] == "valor"
 assert d["outra chave"] == "outro valor"
 print("chaves", d._chaves)
 print("valores", d._valores)
+assert d._tamanho > 3
 
 print("sucesso!")
 
