@@ -13,4 +13,9 @@ class MeuDicionario:
 d = MeuDicionario()
 d["chave"] = "valor"
 assert d["chave"] == "valor"
+assert "chave" in d
+assert "valor" in d.values()
+for c, v in d.items():
+    assert c == "chave"
+    assert v == "valor"
 
