@@ -6,7 +6,6 @@ class MeuDicionario:
         self._valores = [[] for i in range(self._tamanho)]
         
     def _expandir(self):
-        print("expandindo!")
         pares_existentes = list(self.items())
         self._tamanho = int(1.5 * self._tamanho)
         self._chaves = [[] for i in range(self._tamanho)]
@@ -24,7 +23,10 @@ class MeuDicionario:
     
     def __getitem__(self, chave):
         posicao = hash(chave) % self._tamanho
-        sub_posicao = self._chaves[posicao].index(chave)
+        try:
+            sub_posicao = self._chaves[posicao].index(chave)
+        except ValueError:
+            raise KeyError("Chave não Encontrada")
         return self._valores[posicao][sub_posicao]
     
     def __contains__(self, chave):
@@ -56,9 +58,14 @@ for c, v in d.items():
 d["outra chave"] = "outro valor"
 assert d["chave"] == "valor"
 assert d["outra chave"] == "outro valor"
-print("chaves", d._chaves)
-print("valores", d._valores)
 assert d._tamanho > 3
+
+try:
+    d["chave inexistente"]
+except KeyError:
+    pass  # exceção esperada!
+except Exception:
+    raise  # outra exceção, inesperada
 
 print("sucesso!")
 
